@@ -6,7 +6,7 @@
 			// Load Params //
 			var options = $._fbsticker.instances[el_id]['options'];
 			var istate  = $._fbsticker.instances[el_id]['istate'];
-			var loops	= $._fbsticker.instances[el_id]['loops'];
+			var loops   = $._fbsticker.instances[el_id]['loops'];
 			// //
 			if(!options.states || options.states.length == 0) return false;
 			var x = istate;
@@ -18,18 +18,15 @@
 			}
 			var arr = options.states[x]; 
 			istate++;
-			
 			// Save Params //
 			$._fbsticker.instances[el_id]['istate'] = istate;
 			$._fbsticker.instances[el_id]['loops'] = loops;
 			// //
-			
-			return arr;
-            
+			return arr;     
 		},
 		nextFrame: function(node)
 		{
-			var el_id = $(node).attr('id'); //console.log('nextFrame > ' + el_id)
+			var el_id = $(node).attr('id');
 			var state = $._fbsticker.nextState(el_id); 
 			if(!state){
 				$._fbsticker.instances[el_id]['istate'] = 0;
@@ -42,16 +39,14 @@
 		},
 		start: function(node)
 		{
-			var el_id = $(node).attr('id'); // console.log(el_id);
+			var el_id = $(node).attr('id');
 			if(!$._fbsticker.instances[el_id]){ console.warn('Obejo aun no inicializado');return false;}
 			// Load Params //
 			var options = $._fbsticker.instances[el_id]['options'];
 			var istate  = $._fbsticker.instances[el_id]['istate'];
-			var loops	= $._fbsticker.instances[el_id]['loops'];
+			var loops   = $._fbsticker.instances[el_id]['loops'];
 			// //
-			if(!options.states || options.states.length == 0) return false;
-			//var scope = parent;
-			
+			if(!options.states || options.states.length == 0) return false;		
 			if( !$._fbsticker.instances[el_id]['isStart'] ){ 
 				$._fbsticker.instances[el_id]['isStart'] = true; 
 				
@@ -59,7 +54,6 @@
 					$._fbsticker.nextFrame(node);
 				},options.interval)
 			}
-			
 		},
 		stop: function(node)
 		{ 
@@ -73,7 +67,8 @@
 			var el_id = $(node).attr('id');
 			if(!$._fbsticker.instances[el_id]){ console.warn('Obejo aun no inicializado');return false;}
 			$._fbsticker.instances[el_id]['isStart'] ? $._fbsticker.stop(node) : $._fbsticker.start(node);
-		}
+		},
+		last_id: false
 	};
 	
 	jQuery.fn.extend({
@@ -93,6 +88,7 @@
 				,start: (typeof jQuery(this).data('start') != 'undefined')?jQuery(this).data('start'):true
 				,states: (typeof jQuery(this).data('states') != 'undefined')?jQuery(this).data('states'):[]
 				,loops: (typeof jQuery(this).data('loops') != 'undefined')?jQuery(this).data('loops'):0
+				,autoid: true
 			}
 			
 			var options = $.extend({}, defaults, opts); 
@@ -104,8 +100,17 @@
 			var isStart = false;
 			var parent = this;
 
-			var el_id = $(this).attr('id'); //console.log(this); console.log(el_id);
-			
+			var el_id = $(this).attr('id');
+			if( (el_id == undefined || el_id == "") && options.autoid ){
+				if( !$._fbsticker.last_id ){
+					var timenow = new Date().getTime();
+					$._fbsticker.last_id = timenow;
+				}
+				var rnd_id = 'fbs_' + $._fbsticker.last_id;
+				$._fbsticker.last_id = $._fbsticker.last_id + 1;
+				$(this).attr('id',rnd_id);
+				el_id = rnd_id;
+			}
 			if( $._fbsticker.instances[el_id] ){
 				console.warn('Ya se ha iniciado objeto con id:' + el_id);
 				return this;
@@ -117,7 +122,6 @@
 				$._fbsticker.instances[el_id]['loops'] = 0;
 				$._fbsticker.instances[el_id]['isStart'] = false;
 		
-			
 			// Draw The Image //
 			if(options.height){ jQuery(this).css('height',options.height); }
 			if(options.width){ jQuery(this).css('width',options.width); }
@@ -137,8 +141,4 @@
 		fbsticker_stop: function(){ $._fbsticker.stop(this);return this; },
 		fbsticker_toggle: function(){ $._fbsticker.toggle(this);return this; }
 	});
-	
 })(jQuery);
-
-
-
